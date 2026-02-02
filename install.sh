@@ -62,13 +62,8 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 echo ""
 echo "--- Chezmoi Initialization ---"
-echo "Initializing Chezmoi with source: $SCRIPT_DIR"
-"$CHEZMOI_BIN" init --source "$SCRIPT_DIR" --force
-
-echo "Verifying source path..."
-"$CHEZMOI_BIN" source-path
-
-echo "Applying dotfiles..."
-"$CHEZMOI_BIN" apply --force
+echo "Initializing and Applying Chezmoi with source: $SCRIPT_DIR"
+# Use --apply to ensure source is respected immediately
+"$CHEZMOI_BIN" init --apply --source "$SCRIPT_DIR" --force
 
 echo "Setup complete. Please reload your shell."
