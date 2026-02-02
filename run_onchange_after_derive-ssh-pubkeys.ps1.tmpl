@@ -15,22 +15,26 @@ if (Test-Path $sshDir) {
         $privateKeyPath = Join-Path $sshDir $key
         $publicKeyPath = "$privateKeyPath.pub"
         
+        Write-Host "Checking key: $key" -ForegroundColor Gray
+
         if (Test-Path $privateKeyPath) {
-            # Always ensure pub key exists/updates if private key exists
-            # We don't check if pub key exists, we just overwrite to be safe? 
-            # OR check if missing. ssh-keygen -y is fast.
-            
-            Write-Host "Deriving public key for $key..." -ForegroundColor Gray
+            Write-Host "  -> Private key found. Deriving public key..." -ForegroundColor Yellow
             try {
                 $pubKeyContent = ssh-keygen -y -f "$privateKeyPath"
                 if ($pubKeyContent) {
                     $pubKeyContent | Out-File -FilePath $publicKeyPath -Encoding ascii -NoNewline
-                    Write-Host "Generated: $publicKeyPath" -ForegroundColor Green
+                    Write-Host "  -> SUCCESS: Updated $publicKeyPath" -ForegroundColor Green
+                } else {
+                     Write-Warning "  -> ssh-keygen returned empty content for $key"
                 }
             } catch {
-                Write-Warning "Failed to derive public key for ${key}: $_"
+                Write-Warning "  -> Failed to derive public key for ${key}: $_"
             }
+        } else {
+            Write-Host "  -> Private key NOT FOUND at $privateKeyPath" -ForegroundColor Red
         }
     }
+} else {
+    Write-Warning "SSH Directory not found at $sshDir"
 }
 {{- end -}}
