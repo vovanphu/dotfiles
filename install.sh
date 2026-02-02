@@ -52,8 +52,8 @@ if [ -z "${BW_SESSION:-}" ]; then
              echo "Syncing Bitwarden vault..."
              bw sync
         else
-             echo "Failed to unlock vault. Secrets will not be provisioned."
-             exit 1
+             echo "Warning: Failed to unlock vault. Secrets will not be provisioned. Proceeding..."
+             # Do not exit
         fi
     fi
 fi
@@ -65,5 +65,17 @@ echo "--- Chezmoi Initialization ---"
 echo "Initializing and Applying Chezmoi with source: $SCRIPT_DIR"
 # Use --apply to ensure source is respected immediately
 "$CHEZMOI_BIN" init --apply --source "$SCRIPT_DIR" --force
+
+# Cleanup/Backup legacy default keys to avoid confusion
+if [ -f "$HOME/.ssh/id_ed25519" ]; then
+    echo "Backing up legacy default key..."
+    mv "$HOME/.ssh/id_ed25519" "$HOME/.ssh/id_ed25519.bak"
+    mv "$HOME/.ssh/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub.bak" 2>/dev/null || true
+fi
+if [ -f "$HOME/.ssh/id_ed25519_dotfiles" ]; then
+     echo "Backing up legacy dotfiles key..."
+     mv "$HOME/.ssh/id_ed25519_dotfiles" "$HOME/.ssh/id_ed25519_dotfiles.bak"
+     mv "$HOME/.ssh/id_ed25519_dotfiles.pub" "$HOME/.ssh/id_ed25519_dotfiles.pub.bak" 2>/dev/null || true
+fi
 
 echo "Setup complete. Please reload your shell."

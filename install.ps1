@@ -52,7 +52,7 @@ if (-not $env:BW_SESSION) {
             Write-Host "Syncing Bitwarden vault..." -ForegroundColor Gray
             bw sync
         } else {
-            Write-Error "Failed to unlock Bitwarden. Secrets will NOT be provisioned."
+            Write-Warning "Failed to unlock Bitwarden. Secrets will NOT be provisioned. Proceeding with basic installation..."
         }
     }
 }
@@ -75,13 +75,14 @@ if ($LASTEXITCODE -ne 0) {
 
 # Cleanup default keys to avoid confusion (Migration to id_ed25519_dotfiles_master)
 if (Test-Path "$HOME/.ssh/id_ed25519") {
-    Write-Host "Removing legacy default key ($HOME/.ssh/id_ed25519) to avoid confusion..." -ForegroundColor Yellow
-    Remove-Item "$HOME/.ssh/id_ed25519" -Force -ErrorAction SilentlyContinue
-    Remove-Item "$HOME/.ssh/id_ed25519.pub" -Force -ErrorAction SilentlyContinue
+    Write-Host "Backing up legacy default key ($HOME/.ssh/id_ed25519)..." -ForegroundColor Yellow
+    Rename-Item "$HOME/.ssh/id_ed25519" "id_ed25519.bak" -Force -ErrorAction SilentlyContinue
+    Rename-Item "$HOME/.ssh/id_ed25519.pub" "id_ed25519.pub.bak" -Force -ErrorAction SilentlyContinue
 }
 if (Test-Path "$HOME/.ssh/id_ed25519_dotfiles") {
-     Remove-Item "$HOME/.ssh/id_ed25519_dotfiles" -Force -ErrorAction SilentlyContinue
-     Remove-Item "$HOME/.ssh/id_ed25519_dotfiles.pub" -Force -ErrorAction SilentlyContinue
+     Write-Host "Backing up legacy dotfiles key..." -ForegroundColor Yellow
+     Rename-Item "$HOME/.ssh/id_ed25519_dotfiles" "id_ed25519_dotfiles.bak" -Force -ErrorAction SilentlyContinue
+     Rename-Item "$HOME/.ssh/id_ed25519_dotfiles.pub" "id_ed25519_dotfiles.pub.bak" -Force -ErrorAction SilentlyContinue
 }
 
 Write-Host "Applying PowerShell Profile dynamically..." -ForegroundColor Green
@@ -95,11 +96,11 @@ if (Test-Path $templatePath) {
     $rendered = Get-Content $templatePath -Raw | & $CHEZMOI_BIN execute-template --source $PSScriptRoot
     
     if ($LASTEXITCODE -eq 0 -and $rendered) {
-        $rendered | Set-Content -Path $PROFILE -Force
+        $rendered | Set-Content -Path $PROFILE -Force -Encoding UTF8
         Write-Host "Profile applied to: $PROFILE" -ForegroundColor Green
     } else {
         Write-Error "Failed to render PowerShell profile template. Keeping existing profile."
     }
 }
 
-Write-Host "Setup complete. Please restart your terminal." -ForegroundColor Yellow
+Write-Host "Setup complete. Please restart your terminal to reload environment variables." -ForegroundColor Yellow
