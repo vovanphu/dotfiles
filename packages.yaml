@@ -1,0 +1,54 @@
+windows:
+  common:
+    - "Git.Git"
+    - "Bitwarden.CLI"
+  extras: # Installed if NOT 'server' role
+    - "Neovim.Neovim"
+    - "BurntSushi.ripgrep.MSVC"
+    - "junegunn.fzf"
+    - "Starship.Starship"
+    - "ajeetdsouza.zoxide"
+    - "NerdFonts.FiraCode"
+  roles:
+    commander:
+      - "Microsoft.VisualStudioCode"
+      # - "Kubernetes.kubectl"
+      # - "Helm.Helm"
+    workstation:
+      - "Python.Python.3"
+      - "Microsoft.VisualStudioCode"
+      - "Microsoft.WSL"
+      - "Docker.DockerDesktop"
+      - "Microsoft.OpenSSH.Beta"
+    mobilelab: []
+    server: []
+
+linux:
+  common:
+    - "git"
+    - "curl"
+  extras: # Installed if NOT 'server' role
+    - "neovim"
+    - "ripgrep"
+    - "fzf"
+    - "zoxide"
+  roles:
+    commander:
+      - "ansible"
+      # - "kubectl"
+    workstation:
+      - "build-essential"
+      - "g++"
+      - "gcc"
+      - "make"
+    mobilelab:
+      - "qemu-kvm"
+      - "libvirt-daemon-system"
+      - "libvirt-clients"
+      - "bridge-utils"
+      - "virt-manager"
+      - "htop"
+      - "ncdu"
+    server:
+      - "nginx"
+      - "net-tools"

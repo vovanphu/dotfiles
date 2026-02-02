@@ -19,62 +19,36 @@ if command_exists apt-get; then
     sudo apt-get update
 fi
 
+{{- $pkgData := include "packages.yaml" | fromYaml -}}
+{{- $linuxData := $pkgData.linux -}}
+
 # Define minimal base packages (Must be lightweight)
 PACKAGES=(
-    git
-    curl
+{{- range $linuxData.common -}}
+    "{{ . }}"
+{{- end -}}
 )
 
 # Core Tools (Excluded from minimal 'server' role to save resources)
 if [[ "{{ .role }}" != "server" ]]; then
     PACKAGES+=(
-        neovim
-        ripgrep
-        fzf
-        zoxide
+{{- range $linuxData.extras -}}
+        "{{ . }}"
+{{- end -}}
     )
 fi
 
 # Role-specific packages
-{{ if eq .role "commander" }}
-# Tools for The Commander (Control Center)
+{{- if hasKey $linuxData.roles .role -}}
+    {{- $rolePkgs := index $linuxData.roles .role -}}
+    {{- if $rolePkgs }}
 PACKAGES+=(
-    ansible
-    # kubectl
+    {{- range $rolePkgs -}}
+        "{{ . }}"
+    {{- end -}}
 )
-{{ end }}
-
-{{ if eq .role "mobilelab" }}
-# Tools for Mobile Lab (Virtualization Host)
-PACKAGES+=(
-    qemu-kvm
-    libvirt-daemon-system
-    libvirt-clients
-    bridge-utils
-    virt-manager
-    htop
-    ncdu
-)
-{{ end }}
-
-{{ if eq .role "workstation" }}
-# Tools for Workstation (Heavy Dev)
-PACKAGES+=(
-    build-essential
-    g++
-    gcc
-    make
-)
-{{ end }}
-
-{{ if eq .role "server" }}
-# Tools for Server (Gateway/Headless) - Logic: Keep it absolute minimal
-PACKAGES+=(
-    nginx
-    net-tools
-    # No htop/ncdu by default unless requested, standard top/du is enough for 1GB RAM
-)
-{{ end }}
+    {{- end -}}
+{{- end -}}
 
 echo "Installing packages: ${PACKAGES[*]}"
 
