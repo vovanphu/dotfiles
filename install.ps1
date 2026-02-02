@@ -50,6 +50,11 @@ Write-Host "Verifying source path..." -ForegroundColor Gray
 Write-Host "Applying dotfiles..." -ForegroundColor Green
 & $CHEZMOI_BIN apply --force
 
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to apply dotfiles. Please check the logs above."
+    exit 1
+}
+
 Write-Host "Applying PowerShell Profile dynamically..." -ForegroundColor Green
 $PROFILE_DIR = Split-Path $PROFILE -Parent
 if (-not (Test-Path $PROFILE_DIR)) { New-Item -ItemType Directory -Force -Path $PROFILE_DIR | Out-Null }

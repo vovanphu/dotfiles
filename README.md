@@ -13,6 +13,13 @@ My personal dotfiles managed by [chezmoi](https://chezmoi.io).
     # Done! The install script will ask to 'bw unlock' for you.
     ```
 
+### 2. Windows-Specific Setup
+On Windows, for global `ssh-agent` support (so you don't type passwords constantly), you need to run this **once** as **Administrator**:
+```powershell
+Set-Service -Name ssh-agent -StartupType Automatic
+Start-Service ssh-agent
+```
+
 ### 2. Bootstrap
 #### Windows (PowerShell)
 ```powershell
@@ -35,6 +42,6 @@ During initialization, you will be prompted to choose a **Machine Role**:
 | **`server`** | VPS / Gateway | **Headless**. Nginx, Tailscale, minimal keys. |
 
 ## Features
-*   **Automated Secrets**: Pulls SSH Keys directly from Bitwarden Secure Notes (`ssh-key-master`, `ssh-key-server`).
+*   **Automated Secrets**: Pulls SSH Keys directly from Bitwarden Secure Notes (`ssh-key-master-ed25519`, `ssh-key-server-ed25519`).
 *   **Smart Packages**: Installs only what you need based on the selected Role.
 *   **Unified Shell**: Starship prompt & aliases consistent across PowerShell and Bash.

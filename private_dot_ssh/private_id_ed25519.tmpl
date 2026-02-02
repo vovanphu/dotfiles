@@ -2,7 +2,7 @@
 {{-   if (env "BW_SESSION") -}}
 {{-     $key := (bitwarden "item" "ssh-key-master-ed25519") -}}
 {{-     if $key -}}
-{{ $key.notes }}
+{{ $key.notes | replace "\r" "" | trim }}{{ printf "\n" }}
 {{-     end -}}
 {{-   end -}}
 {{- end -}}

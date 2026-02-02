@@ -97,8 +97,9 @@ Sensitive files (like `.ssh/config`) will be stored using Chezmoi's `private_` p
 
 *   **Bitwarden CLI (`bw`)**: Primary secret provider.
 *   **Key Storage Strategy**:
-    *   `commander` & `workstation`: Auto-pull `id_rsa_master` from Bitwarden note `ssh-key-master`.
-    *   `mobilelab` & `server`: Auto-pull `id_rsa_server` (if needed) or rely on Agent Forwarding.
+    *   `commander` & `workstation`: Auto-pull `id_ed25519` (Master Ed25519 Key) from Bitwarden note `ssh-key-master-ed25519`.
+    *   `mobilelab` & `server`: Auto-pull `id_ed25519_server` (Server Ed25519 Key) from Bitwarden note `ssh-key-server-ed25519`.
+    *   **Cross-Machine Access**: `workstation` automatically authorizes `commander` by pulling the Master Public Key from Bitwarden into `authorized_keys`.
 
 ## 6. Future Considerations
 *   **Package Management**: Linking `Brewfile`, `scoop export`, and `apt bundle` lists to the dotfiles lifecycle.

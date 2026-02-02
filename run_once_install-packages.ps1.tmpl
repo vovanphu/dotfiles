@@ -1,6 +1,7 @@
 {{- if eq .chezmoi.os "windows" -}}
 # run_once_install-packages.ps1.tmpl
 # This script runs only when the hash of this file changes.
+# Version: 1.1 (Force Run for Agent Setup)
 
 Write-Host "Starting Windows Package Installation via Winget..." -ForegroundColor Cyan
 
@@ -46,6 +47,16 @@ $packages += "Bitwarden.CLI"
 foreach ($package in $packages) {
     Write-Host "Checking/Installing $package..." -ForegroundColor Gray
     winget install --id $package -e --silent --accept-package-agreements --accept-source-agreements
+}
+
+# Ensure SSH Agent is running for "AddKeysToAgent" to work
+Write-Host "Configuring SSH Agent..." -ForegroundColor Gray
+try {
+    Set-Service -Name ssh-agent -StartupType Automatic -ErrorAction Stop
+    Start-Service ssh-agent -ErrorAction Stop
+} catch {
+    Write-Host "Warning: Could not authenticate SSH Agent service (Requires Admin)." -ForegroundColor Yellow
+    Write-Host "    You may need to run 'Set-Service ssh-agent -StartupType Automatic' as Administrator manually." -ForegroundColor Gray
 }
 
 Write-Host "Windows Package Installation Complete!" -ForegroundColor Green
