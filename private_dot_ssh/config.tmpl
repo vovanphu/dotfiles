@@ -14,12 +14,12 @@ Host github.com
 # Role-Based Keys
 {{- if or (eq .role "commander") (eq .role "workstation") }}
 # Master Identity (Commander & Workstation)
-IdentityFile ~/.ssh/id_ed25519
+IdentityFile ~/.ssh/id_ed25519_dotfiles_master
 {{- end }}
 
 {{- if or (eq .role "mobilelab") (eq .role "server") }}
 # Deploy Identity (Mobile Lab & Server)
-IdentityFile ~/.ssh/id_ed25519_server
+IdentityFile ~/.ssh/id_ed25519_dotfiles_server
 {{- end }}
 
 # Server (Gateway) typically relies on Agent Forwarding or separate deploy keys

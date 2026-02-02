@@ -26,9 +26,22 @@ Write-Host "Entering Server Environment... [SAFE MODE]" -ForegroundColor Yellow
 Write-Host "Entering Dotfiles Environment (Role: {{ .role }})..." -ForegroundColor Gray
 {{- end }}
 
+# --- SSH Agent Auto-Load ---
+# Ensure ssh-agent is running
+if ((Get-Service ssh-agent).Status -ne 'Running') {
+    Start-Service ssh-agent
+}
+# Add Master Key if not present
+if (Test-Path "$HOME/.ssh/id_ed25519_dotfiles_master") {
+    $sshList = ssh-add -l
+    if ($sshList -notmatch "SHA256") {
+        # Redirect stderr to void to hide "Identity added" noise if successful
+        ssh-add "$HOME/.ssh/id_ed25519_dotfiles_master" 2>$null
+    }
+}
+
 # Bitwarden Helper: Auto-unlock if needed
 function bw-unlock {
-    if (Get-Command bw -ErrorAction SilentlyContinue) {
         $status = bw status | ConvertFrom-Json
         if ($status.status -eq "locked") {
             Write-Host "Bitwarden is locked. Unlocking..." -ForegroundColor Yellow

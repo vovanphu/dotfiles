@@ -68,9 +68,9 @@ if [ ! -S "$SSH_AUTH_SOCK" ]; then
     eval "$(ssh-agent -s -a "$SSH_AUTH_SOCK")" > /dev/null
 fi
 
-{{- $keyFile := "id_ed25519" -}}
+{{- $keyFile := "id_ed25519_dotfiles_master" -}}
 {{- if or (eq .role "server") (eq .role "mobilelab") -}}
-{{-   $keyFile = "id_ed25519_server" -}}
+{{-   $keyFile = "id_ed25519_dotfiles_server" -}}
 {{- end -}}
 
 if [ -f "$HOME/.ssh/{{ $keyFile }}" ]; then

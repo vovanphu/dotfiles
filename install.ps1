@@ -73,6 +73,17 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+# Cleanup default keys to avoid confusion (Migration to id_ed25519_dotfiles_master)
+if (Test-Path "$HOME/.ssh/id_ed25519") {
+    Write-Host "Removing legacy default key ($HOME/.ssh/id_ed25519) to avoid confusion..." -ForegroundColor Yellow
+    Remove-Item "$HOME/.ssh/id_ed25519" -Force -ErrorAction SilentlyContinue
+    Remove-Item "$HOME/.ssh/id_ed25519.pub" -Force -ErrorAction SilentlyContinue
+}
+if (Test-Path "$HOME/.ssh/id_ed25519_dotfiles") {
+     Remove-Item "$HOME/.ssh/id_ed25519_dotfiles" -Force -ErrorAction SilentlyContinue
+     Remove-Item "$HOME/.ssh/id_ed25519_dotfiles.pub" -Force -ErrorAction SilentlyContinue
+}
+
 Write-Host "Applying PowerShell Profile dynamically..." -ForegroundColor Green
 $PROFILE_DIR = Split-Path $PROFILE -Parent
 if (-not (Test-Path $PROFILE_DIR)) { New-Item -ItemType Directory -Force -Path $PROFILE_DIR | Out-Null }
