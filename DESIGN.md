@@ -99,6 +99,7 @@ Sensitive files (like `.ssh/config`) will be stored using Chezmoi's `private_` p
 *   **Key Storage Strategy**:
     *   `commander` & `workstation`: Auto-pull `id_ed25519` (Master Ed25519 Key) from Bitwarden note `ssh-key-master-ed25519`.
     *   `mobilelab` & `server`: Auto-pull `id_ed25519_server` (Server Ed25519 Key) from Bitwarden note `ssh-key-server-ed25519`.
+    *   **Public Key Derivation**: To ensure consistency, Public Keys (`.pub`) are **not** stored in Bitwarden. Instead, a local `run_onchange_` script automatically derives them from the private keys (`ssh-keygen -y`) whenever the private key template changes.
     *   **Cross-Machine Access**: `workstation` automatically authorizes `commander` by pulling the Master Public Key from Bitwarden into `authorized_keys`.
 
 ## 6. Future Considerations

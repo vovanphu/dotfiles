@@ -54,4 +54,6 @@ During initialization, you will be prompted to choose a **Machine Role**:
     *   **Windows**: Auto-starts `ssh-agent`, handles `bw login/unlock/sync`.
     *   **WSL**: Implements **Socket Reuse** so all terminal tabs share one `ssh-agent` session.
     *   **Safety**: Validates line-endings (LF) for keys to prevent `libcrypto` errors.
+    *   **Self-Healing**: Automatically derives SSH Public keys (`.pub`) locally whenever private keys change, ensuring `ssh-copy-id` always works.
+    *   **GUI Ready**: Automatically installs **FiraCode Nerd Font** on Windows and Linux (non-server roles) to ensure the terminal looks perfect.
 *   **🐚 Unified Shell**: Starship prompt & aliases consistent across PowerShell and Bash.
