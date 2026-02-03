@@ -31,7 +31,6 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/vovanphu/dotfiles/master/i
 
 ---
 
-## 🤖 Role Selection
 ## 🤖 Role Selection: "The Mythos"
 We use a **Mythological Role System** to categorize machines. Choose wisely:
 
