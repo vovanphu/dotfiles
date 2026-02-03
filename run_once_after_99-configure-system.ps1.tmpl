@@ -1,0 +1,57 @@
+{{- if eq .chezmoi.os "windows" -}}
+# run_once_after_99-configure-system.ps1.tmpl
+# This script manages system-level configurations like Hostname and Tailscale.
+
+$targetName = "{{ .hostname }}"
+$currentName = $env:COMPUTERNAME
+
+Write-Host "--- System Configuration ---" -ForegroundColor Cyan
+
+# 1. Tailscale Configuration (Automatic)
+if (Get-Command tailscale -ErrorAction SilentlyContinue) {
+    Write-Host "Found Tailscale. Checking status..." -ForegroundColor Cyan
+    $status = tailscale status 2>&1
+    
+    if ($status -match "Logged out" -or $status -match "Tailscale is stopped") {
+        Write-Host "Tailscale is not logged in. Attempting auto-auth via Bitwarden..." -ForegroundColor Yellow
+        if ($env:BW_SESSION) {
+            try {
+                $tsKey = bw get password "tailscale-auth-key"
+                if ($tsKey) {
+                    Write-Host "Tailscale Auth Key retrieved. Authenticating as '$targetName'..." -ForegroundColor Cyan
+                    tailscale up --authkey $tsKey --hostname $targetName --accept-routes
+                    Write-Host "Tailscale Connected Successfully!" -ForegroundColor Green
+                }
+            } catch {
+                Write-Warning "Could not retrieve Tailscale key from Bitwarden."
+            }
+        } else {
+            Write-Warning "Bitwarden session not active. Skipping Tailscale auto-login."
+        }
+    } else {
+         Write-Host "Tailscale is already logged in. Updating hostname preference..." -ForegroundColor Green
+         tailscale set --hostname $targetName
+    }
+}
+
+# 2. OS Hostname Configuration (Prompt)
+if ($currentName -ne $targetName) {
+    Write-Host "Current System Name: $currentName" -ForegroundColor Yellow
+    Write-Host "Target Mythos Name:  $targetName" -ForegroundColor Green
+    
+    $choice = Read-Host "Do you want to rename this computer (OS Level) to '$targetName'? (y/n)"
+    if ($choice -eq 'y') {
+        try {
+            Rename-Computer -NewName $targetName -Force -ErrorAction Stop
+            Write-Host "SUCCESS: Hostname changed to '$targetName'." -ForegroundColor Green
+            Write-Host "IMPORTANT: You must RESTART your computer for this to take effect." -ForegroundColor Red
+        } catch {
+            Write-Error "Failed to rename computer. Please ensure you are running this script as ADMINISTRATOR."
+        }
+    } else {
+        Write-Host "Skipping OS rename. Hostname remains '$currentName'." -ForegroundColor Gray
+    }
+} else {
+    Write-Host "System Hostname is already synced ($targetName)." -ForegroundColor Green
+}
+{{- end -}}

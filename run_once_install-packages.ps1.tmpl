@@ -14,7 +14,9 @@ $packages = @()
 $packages += $winData.common
 
 # Core Tools (Excluded from minimal 'server' role)
-if ("{{ .role }}" -ne "server") {
+# Core Tools (Excluded from headless 'server' roles)
+# Headless Roles: cyclops, hydra, kraken, cerberus, golem, minion, siren
+if ("{{ .role }}" -eq "centaur" -or "{{ .role }}" -eq "chimera" -or "{{ .role }}" -eq "griffin") {
     $packages += $winData.extras
     
     # Fonts are in 'extras' list in yaml, processed normally by loop now

@@ -1,0 +1,81 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+# run_once_after_99-configure-system.sh.tmpl
+
+TARGET_NAME="{{ .hostname }}"
+CURRENT_NAME=$(hostname)
+
+echo "--- System Configuration ---"
+
+# Function to check if running as root
+is_root() {
+    [ "$(id -u)" -eq 0 ]
+}
+
+# 1. Tailscale Configuration (Automatic)
+if command -v tailscale >/dev/null 2>&1; then
+    echo "Found Tailscale. Checking status..."
+    # Check if logged in (status returns exit code 1 if not running/logged out usually)
+    if ! tailscale status >/dev/null 2>&1; then
+        echo "Tailscale is not logged in. Attempting auto-auth via Bitwarden..."
+        
+        if [ -n "$BW_SESSION" ]; then
+             TS_KEY=$(bw get password "tailscale-auth-key")
+             if [ -n "$TS_KEY" ]; then
+                 echo "Tailscale Auth Key retrieved. Authenticating as '$TARGET_NAME'..."
+                 if is_root; then
+                     tailscale up --authkey "$TS_KEY" --hostname "$TARGET_NAME" --accept-routes
+                 else
+                     sudo tailscale up --authkey "$TS_KEY" --hostname "$TARGET_NAME" --accept-routes
+                 fi
+                 echo "Tailscale Connected Successfully!"
+             else
+                 echo "Warning: Retrieved empty Tailscale key."
+             fi
+        else
+            echo "Warning: Bitwarden session not active. Skipping Tailscale auto-login."
+        fi
+    else
+        echo "Tailscale is already logged in. Updating hostname preference..."
+        if is_root; then
+            tailscale set --hostname "$TARGET_NAME"
+        else
+            sudo tailscale set --hostname "$TARGET_NAME"
+        fi
+    fi
+fi
+
+# 2. OS Hostname Configuration (Prompt)
+if [ "$CURRENT_NAME" != "$TARGET_NAME" ]; then
+    echo -e "Current Hostname: \033[33m$CURRENT_NAME\033[0m"
+    echo -e "Target Mythos Name:  \033[32m$TARGET_NAME\033[0m"
+    
+    read -p "Do you want to rename this system (OS Level) to '$TARGET_NAME'? (y/n) " -n 1 -r
+    echo 
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "Renaming system..."
+        
+        if command -v hostnamectl >/dev/null 2>&1; then
+            # Systemd method
+            sudo hostnamectl set-hostname "$TARGET_NAME"
+        else
+            # Legacy method
+            sudo hostname "$TARGET_NAME"
+            echo "$TARGET_NAME" | sudo tee /etc/hostname > /dev/null
+            
+            # Update /etc/hosts to prevent sudo warnings
+            if grep -q "127.0.1.1" /etc/hosts; then
+                sudo sed -i "s/^127.0.1.1.*/127.0.1.1\t$TARGET_NAME/" /etc/hosts
+            else
+                echo -e "127.0.1.1\t$TARGET_NAME" | sudo tee -a /etc/hosts > /dev/null
+            fi
+        fi
+        
+        echo -e "\033[32mSuccess: Hostname changed. Please restart your shell/system.\033[0m"
+    else
+        echo "Skipping OS rename."
+    fi
+else
+    echo -e "\033[32mSystem Hostname is already synced.\033[0m"
+fi
+{{- end -}}

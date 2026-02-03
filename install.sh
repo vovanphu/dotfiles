@@ -1,4 +1,43 @@
 #!/bin/bash
+# Usage: ./install.sh
+#        OR: sh -c "$(curl -fsSL https://raw.githubusercontent.com/vovanphu/dotfiles/master/install.sh)"
+
+# --- Remote Bootstrap Logic ---
+# Detect if running from pipe/curl (SCRIPT_DIR will be empty or dot)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ "$SCRIPT_DIR" = "." ] || [ -z "$SCRIPT_DIR" ]; then 
+    # Double check if we are in a repo
+    if [ ! -d ".git" ]; then
+        echo "Running in Remote Bootstrap Mode..."
+        DEST_DIR="$HOME/dotfiles"
+        
+        # 1. Install Git if missing
+        if ! command -v git &> /dev/null; then
+            echo "Git not found. Installing..."
+            if command -v apt-get &> /dev/null; then
+                sudo apt-get update && sudo apt-get install -y git
+            else
+                echo "Error: Git is required. Please install Git manually."
+                exit 1
+            fi
+        fi
+        
+        # 2. Clone Repo
+        if [ ! -d "$DEST_DIR" ]; then
+            echo "Cloning repository to $DEST_DIR..."
+            git clone https://github.com/vovanphu/dotfiles.git "$DEST_DIR"
+        else
+            echo "Repo exists. Pulling latest..."
+            cd "$DEST_DIR" || exit
+            git pull
+        fi
+        
+        # 3. Handover
+        echo "Handing over to local install script..."
+        exec "$DEST_DIR/install.sh"
+    fi
+fi
+# ------------------------------
 
 # Identify chezmoi binary (Default to ~/.local/bin)
 CHEZMOI_BIN="$HOME/.local/bin/chezmoi"

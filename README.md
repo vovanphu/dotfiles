@@ -6,8 +6,10 @@ My personal dotfiles managed by [chezmoi](https://chezmoi.io).
 ## 🚀 Installation
 
 ### 1. Prerequisites
-*   **Bitwarden Account**: You must have a Bitwarden account with the necessary "Secure Notes" for SSH keys.
-*   **Internet**: Obviously.
+*   **Bitwarden Account**: You need a Bitwarden account with the following items:
+    *   **Secure Notes**: `ssh-key-master-ed25519` and `ssh-key-server-ed25519` (Private Keys).
+    *   **Login**: `tailscale-auth-key` (Reusable key). *Note: Must be rotated every 90 days.*
+*   **Internet**: Required for package downloads.
 
 ### 2. Quick Start
 
@@ -15,46 +17,45 @@ My personal dotfiles managed by [chezmoi](https://chezmoi.io).
 The script will automatically install `chezmoi`, `bitwarden-cli`, `git`, configure `ssh-agent`, and provision your keys.
 
 ```powershell
-# 1. Clone the repo (or download zip if no git yet)
-git clone https://github.com/vovanphu/dotfiles.git "$HOME/dotfiles"
-cd "$HOME/dotfiles"
-
-# 2. Run the magic script
-.\install.ps1
+# Run this valid one-liner in PowerShell Administrator:
+irm https://raw.githubusercontent.com/vovanphu/dotfiles/master/install.ps1 | iex
 ```
 
 #### 🐧 Linux / WSL
 The script handles dependency checks (`unzip`, `curl`), Bitwarden login, and SSH agent reuse for WSL.
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/vovanphu/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-
-# 2. Run the magic script
-./install.sh
+# Run this valid one-liner:
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/vovanphu/dotfiles/master/install.sh)"
 ```
 
 ---
 
 ## 🤖 Role Selection
-During initialization, you will be prompted to choose a **Machine Role**:
+## 🤖 Role Selection: "The Mythos"
+We use a **Mythological Role System** to categorize machines. Choose wisely:
 
-| Role | Description | Key Features |
+| Role | Core Concept | Typical Use Case |
 | :--- | :--- | :--- |
-| **`commander`** | XPS 13 / Macbook | **Control Center**. Full admin tools, Master SSH Keys. |
-| **`workstation`** | Company PC | **Heavy Dev**. Compilers, Docker, Master SSH Keys. |
-| **`mobilelab`** | XPS 15 (Debian) | **Infrastructure**. KVM, K8s tools, Server Keys. |
-| **`server`** | VPS / Gateway | **Headless**. Nginx, minimal keys. |
+| **`centaur`** | **The Wise Commander** | Laptop/Mac. Admin, Management. |
+| **`chimera`** | **The Hybrid Beast** | Windows Workstation + WSL. |
+| **`hydra`** | **The Undying Cluster** | Proxmox Host. |
+| **`griffin`** | **The Guardian** | Portable Debit/KVM Lab. |
+| **`cyclops`** | **The Strong** | General Purpose Server. |
+| *Server Fleet* | *Specialized Units* | `kraken` (Storage), `cerberus` (Bastion), `golem` (DB), `minion` (Worker), `siren` (Web). |
 
 ## ✨ Features
 *   **🔐 Automated Secrets**: Pulls SSH Keys directly from Bitwarden (`ssh-key-master-ed25519` -> `~/.ssh/id_ed25519_dotfiles_master`).
+*   **📦 Centralized Packages**: All software definitions live in [`packages.yaml`](packages.yaml), separating data from installation scripts.
+*   **🏷️ Mythological Name Pools**: Curated lists of names (e.g., `chiron`, `polyphemus`) for each role, ensuring unique and thematic hostnames.
+*   **🌐 Zero-Touch Connectivity**: **Tailscale** automatically authenticates via Bitwarden and configures MagicDNS without manual login.
 *   **🛡️ Namespaced Keys**: Uses explicit filenames to avoid conflicts with system defaults.
 *   **🔧 Local Overrides**: Supports `~/.ssh/config.local` for custom SSH hosts that are not managed by dotfiles.
 *   **🧠 Intelligent Scripts**:
+    *   **Safety First**: Backs up old SSH keys instead of deleting them. Soft-fails if Bitwarden is unreachable.
+    *   **Hostname Sync**: Detects mismatch between config and OS hostname, prompting for a safe rename.
     *   **Windows**: Auto-starts `ssh-agent`, handles `bw login/unlock/sync`.
     *   **WSL**: Implements **Socket Reuse** so all terminal tabs share one `ssh-agent` session.
-    *   **Safety**: Validates line-endings (LF) for keys to prevent `libcrypto` errors.
-    *   **Self-Healing**: Automatically derives SSH Public keys (`.pub`) locally whenever private keys change, ensuring `ssh-copy-id` always works.
-    *   **GUI Ready**: Automatically installs **FiraCode Nerd Font** on Windows and Linux (non-server roles) to ensure the terminal looks perfect.
+    *   **Self-Healing**: Automatically derives SSH Public keys (`.pub`) locally whenever private keys change.
+    *   **GUI Ready**: Automatically installs **FiraCode Nerd Font** on Windows and Linux (Interactive roles).
 *   **🐚 Unified Shell**: Starship prompt & aliases consistent across PowerShell and Bash.

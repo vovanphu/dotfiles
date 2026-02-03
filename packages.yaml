@@ -1,3 +1,71 @@
+name_pools:
+  centaur: # Commander - The Wise / Teachers
+    - "chiron"    # The Wisest
+    - "nessus"    # The Ferryman
+    - "pholus"    # The Protector
+    - "eurytion"  # The Wild
+    - "hylaeus"   # The Forest Walker
+    - "rhoecus"   # The Tree Guardian
+  chimera: # Workstation - Hybrid Beasts
+    - "leo"       # Head of Lion
+    - "capra"     # Head of Goat
+    - "draco"     # Dragon tail
+    - "pegasus"   # (Related Hybrid)
+    - "sphinx"    # (Related Hybrid)
+    - "manticore" # (Related Hybrid)
+  hydra: # HomeLab - Multi-headed / Regenerative
+    - "lernaean"  # The Original
+    - "immortal"  # The Undying Head
+    - "tiamat"    # Chaos Dragon (5 heads)
+    - "orochi"    # 8-headed snake
+    - "scylla"    # Many-headed cliff monster
+  griffin: # MobileLab - Guardians
+    - "gold"      # Guardian of Gold
+    - "sky"       # Lord of Sky
+    - "lion"      # Lord of Earth
+    - "hippogriff" # Relative (Horse+Eagle)
+    - "garuda"    # Eastern Divine Bird
+  cyclops: # Server - Single Purpose / Strength
+    - "polyphemus" # The most famous
+    - "brontes"   # Thunder
+    - "steropes"  # Lightning
+    - "arges"     # Brightness
+    - "balor"     # Evil Eye (Celtic)
+  kraken: # Storage - Deep Sea
+    - "abyss"
+    - "leviathan"
+    - "cthulhu"
+    - "davyjones"
+    - "trench"
+  cerberus: # Bastion - Gatekeepers
+    - "spot"      # Hades' pet name
+    - "gatekeeper"
+    - "othrus"    # Two-headed brother
+    - "anubis"    # Egyptian Gatekeeper
+    - "heimdall"  # Guardian of Bifrost
+  golem: # Database - Materials / Constructs
+    - "clay"
+    - "stone"
+    - "iron"
+    - "obsidian"
+    - "colossus"  # Rhodes
+    - "talos"     # Bronze Giant
+  minion: # Worker - Numerous / Swarm
+    - "kevin"
+    - "bob"
+    - "stuart"
+    - "dave"
+    - "jerry"
+    - "zergling"  # Starcraft
+    - "drone"
+  siren: # Web - Allure / Voice
+    - "parthenope"
+    - "ligeia"
+    - "leucosia"
+    - "calypso"
+    - "circe"
+    - "echo"
+
 windows:
   common:
     - "Git.Git"
@@ -10,18 +78,18 @@ windows:
     - "ajeetdsouza.zoxide"
     - "NerdFonts.FiraCode"
   roles:
-    commander:
+    centaur: # Formerly Commander (Chiron the Wise)
       - "Microsoft.VisualStudioCode"
       # - "Kubernetes.kubectl"
       # - "Helm.Helm"
-    workstation:
+    chimera: # Formerly Workstation
       - "Python.Python.3"
       - "Microsoft.VisualStudioCode"
       - "Microsoft.WSL"
       - "Docker.DockerDesktop"
       - "Microsoft.OpenSSH.Beta"
-    mobilelab: []
-    server: []
+    hydra: [] # Formerly MobileLab
+    cyclops: [] # Formerly Server
 
 linux:
   common:
@@ -33,15 +101,19 @@ linux:
     - "fzf"
     - "zoxide"
   roles:
-    commander:
+    centaur: # Formerly Commander
       - "ansible"
       # - "kubectl"
-    workstation:
+    chimera: # Formerly Workstation
       - "build-essential"
       - "g++"
       - "gcc"
       - "make"
-    mobilelab:
+    hydra: # Proxmox Host (Bare Metal) - Minimal, PVE handles the rest
+      - "htop"
+      - "ncdu"
+      - "neofetch"
+    griffin: # formerly MobileLab (Debian + KVM)
       - "qemu-kvm"
       - "libvirt-daemon-system"
       - "libvirt-clients"
@@ -49,6 +121,24 @@ linux:
       - "virt-manager"
       - "htop"
       - "ncdu"
-    server:
+    cyclops: # General Purpose Server
       - "nginx"
       - "net-tools"
+    cerberus: # Bastion/Gateway
+      - "fail2ban"
+      - "ufw"
+      - "wireguard-tools"
+    golem: # Database/Stateful
+      - "postgresql-client"
+      - "redis-tools"
+    minion: # Worker/Compute
+      - "docker.io"
+      - "htop"
+    siren: # Web/Proxy
+      - "nginx"
+      - "certbot"
+      - "python3-certbot-nginx"
+    kraken: # Ceph/Storage Node
+      - "ceph-common"
+      - "xfsprogs"
+      - "smartmontools"

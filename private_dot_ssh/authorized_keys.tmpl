@@ -1,11 +1,11 @@
-{{- /* Only generate authorized_keys for Workstation, Server, or MobileLab */ -}}
-{{- if or (eq .role "workstation") (eq .role "mobilelab") (eq .role "server") -}}
+{{- /* Only generate authorized_keys for Chimera or Server Fleet */ -}}
+{{- if or (eq .role "chimera") (eq .role "hydra") (eq .role "griffin") (eq .role "cyclops") (eq .role "kraken") (eq .role "cerberus") (eq .role "golem") (eq .role "minion") (eq .role "siren") -}}
 {{-   if (env "BW_SESSION") -}}
 {{-     $masterKey := (bitwarden "item" "ssh-key-master-ed25519") -}}
 {{-     if $masterKey -}}
 {{-       range $masterKey.fields -}}
 {{-         if eq .name "public_key" -}}
-# Master Key (Commander/Access from Laptop)
+# Master Key (Access from Centaur/Chimera)
 {{ .value }}
 {{-         end -}}
 {{-       end -}}

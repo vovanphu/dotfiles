@@ -1,5 +1,37 @@
 # Windows Bootstrap Script for Dotfiles
 # Usage: powershell -ExecutionPolicy Bypass -File install.ps1
+#        OR: irm https://raw.githubusercontent.com/vovanphu/dotfiles/master/install.ps1 | iex
+
+# --- Remote Bootstrap Logic ---
+if (-not $PSScriptRoot) {
+    Write-Host "Running in Remote Bootstrap Mode..." -ForegroundColor Cyan
+    $DEST_DIR = "$HOME\dotfiles"
+    
+    # 1. Install Git if missing
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        Write-Host "Git not found. Installing via Winget..." -ForegroundColor Yellow
+        winget install --id Git.Git -e --source winget --accept-source-agreements --accept-package-agreements
+        # Refresh Env
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    }
+    
+    # 2. Clone Repo
+    if (-not (Test-Path $DEST_DIR)) {
+        Write-Host "Cloning repository to $DEST_DIR..." -ForegroundColor Cyan
+        git clone https://github.com/vovanphu/dotfiles.git $DEST_DIR
+    } else {
+        Write-Host "Repository already exists at $DEST_DIR. Pulling latest..." -ForegroundColor Cyan
+        Set-Location $DEST_DIR
+        git pull
+    }
+    
+    # 3. Handover to local script
+    Write-Host "Handing over to local install script..." -ForegroundColor Green
+    Set-Location $DEST_DIR
+    & "$DEST_DIR\install.ps1"
+    exit
+}
+# ------------------------------
 
 # Identify chezmoi binary (Check PATH, then default Winget location)
 $CHEZMOI_BIN = Get-Command chezmoi -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source

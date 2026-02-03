@@ -52,15 +52,38 @@ graph TD
 *   `dot_bashrc`: Linux-specific shell entry point.
 *   `dot_gitconfig.tmpl`: Generalized Git configuration with identity templates.
 
-### 3.3. Role Architecture
-To avoid "configuration bloat," we categorize machines by their primary function (**Role**). A role dictates which sets of aliases, tools, and security policies are applied.
+### 3.3. Role Architecture: "The Mythos"
+We categorize machines using a mythological naming convention that reflects their power and function.
 
-| Role | Codename | Target Hardware | Primary Function | Software & Security |
-| :--- | :--- | :--- | :--- | :--- |
-| **Commander** | `commander` | XPS 13 / Mac | **Control Center**. Administering servers, Managing clusters. "The Nuclear Football". | **GUI**: VS Code, Antigravity. **CLI**: K9s, Ansible. **Security**: Master Keys. |
-| **Workstation** | `workstation` | PC Co (Win/WSL) | **Heavy Lifter**. Daily coding, Compiling, AI Training. | **GUI**: VS Code, Docker Desktop. **OS**: WSL. **Security**: Master Keys. |
-| **Mobile Lab** | `mobilelab` | XPS 15 (Debian) | **Infrastructure**. Portable Lab. KVM Hypervisor. | **OS**: Debian Native. **CLI**: virt-manager, bridge-utils. **Security**: Deploy Keys. |
-| **Server** | `server` | VPS (1GB RAM) | **Gateway**. Headless. Reverse Proxy. | **CLI**: Minimal (Git, Curl, Nginx). No heavy tools. **Security**: Agent Forwarding. |
+| Role | Name | Concept | Primary Function |
+| :--- | :--- | :--- | :--- |
+| **Commander** | **`centaur`** | *Chiron (The Wise)* | **Control Center**. Laptop/Mac. Admin tools, Master Keys. |
+| **Workstation** | **`chimera`** | *The Hybrid* | **Heavy Lifter**. Windows+WSL. Dev tools, Docker. |
+| **HomeLab** | **`hydra`** | *The Undying* | **Proxmox Cluster**. Bare metal virtualization. Minimal host. |
+| **MobileLab** | **`griffin`** | *The Guardian* | **Debian Laptop**. Portable KVM virtualization. |
+| **Storage** | **`kraken`** | *The Deep* | **Ceph Cluster**. Distributed storage nodes. |
+| **Server** | **`cyclops`** | *The Strong* | **Generic Server**. Headless, single-purpose. |
+| **Bastion** | **`cerberus`** | *The Gatekeeper* | **Gateway**. VPN/SSH Jump host. Hardened. |
+| **Database** | **`golem`** | *The Construct* | **Stateful Node**. Postgres/Redis storage. |
+| **Worker** | **`minion`** | *The Laborer* | **Compute Node**. CI Runners, Docker Swarm workers. |
+| **Web** | **`siren`** | *The Allure* | **Frontend**. Nginx/Proxy. Public facing. |
+
+### 3.4. Package Management Strategy
+To avoid script bloat, we decouple data from logic.
+*   **Source of Truth**: [`packages.yaml`](packages.yaml) contains the definitive list of software for every OS and Role.
+*   **Execution**: Installation scripts (`.ps1.tmpl`, `.sh.tmpl`) dynamically parse this YAML at runtime to determine what to install.
+
+### 3.5. Naming & Connectivity (Network Layer)
+Instead of static IP tables, we utilize **Tailscale MagicDNS** for dynamic service discovery.
+
+**Naming Convention**:
+To ensure machines are identifiable within the Tailnet:
+*   **Format**: `[MythologicalName]`
+*   **Examples**:
+    *   `chiron` (Centaur/Commander)
+    *   `leo` (Chimera/Workstation)
+    *   `polyphemus` (Cyclops/Server)
+*   **Why?**: Names are chosen from unique pools per role, ensuring no collision. A role suffix is redundant.
 
 ## 4. Technical Strategy
 
@@ -104,6 +127,12 @@ Sensitive files (like `.ssh/config`) will be stored using Chezmoi's `private_` p
     *   **Cross-Machine Access**: `workstation` automatically authorizes `commander` by pulling the Master Public Key from Bitwarden into `authorized_keys`.
     *   **Local Overrides**: The managed `config` file includes `config.local*`, allowing users to maintain unmanaged configurations alongside managed ones.
 
-## 6. Future Considerations
+## 6. Maintenance & Operations
+*   **Tailscale Auth Key Rotation**: The `tailscale-auth-key` in Bitwarden expires every 90 days.
+    *   *Impact*: New machine installations will fail to auto-join Tailscale after expiry. Existing machines are unaffected (due to Tags).
+    *   *Action*: Every 3 months (or upon installation failure), generate a new Reusable Key on Tailscale Console and update the `tailscale-auth-key` password in Bitwarden.
+*   **SSH Key Rotation**: If Master Keys are compromised, generate new ones, update Bitwarden, and run `chezmoi apply` on all machines.
+
+## 7. Future Considerations
 *   **Package Management**: Linking `Brewfile`, `scoop export`, and `apt bundle` lists to the dotfiles lifecycle.
 *   **CI/CD**: Automatic linting of shell scripts and templates via GitHub Actions.

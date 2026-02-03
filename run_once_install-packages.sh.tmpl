@@ -19,6 +19,12 @@ if command_exists apt-get; then
     sudo apt-get update
 fi
 
+# Pre-install Tailscale via official script (Handle Repos) if missing
+if ! command_exists tailscale; then
+    echo "Tailscale not found. Running official installer to setup repos..."
+    curl -fsSL https://tailscale.com/install.sh | sh
+fi
+
 {{- $pkgData := include "packages.yaml" | fromYaml -}}
 {{- $linuxData := $pkgData.linux -}}
 
@@ -29,8 +35,9 @@ PACKAGES=(
 {{- end -}}
 )
 
-# Core Tools (Excluded from minimal 'server' role to save resources)
-if [[ "{{ .role }}" != "server" ]]; then
+# Core Tools (Excluded from headless 'server' roles to save resources)
+# Only install 'extras' (Neovim, Ripgrep, Starship) on Interactive roles:
+if [[ "{{ .role }}" == "centaur" || "{{ .role }}" == "chimera" || "{{ .role }}" == "griffin" ]]; then
     PACKAGES+=(
 {{- range $linuxData.extras -}}
         "{{ . }}"
@@ -59,7 +66,8 @@ else
 fi
 
 # Install Starship ONLY for non-server roles (Save RAM/Disk)
-if [[ "{{ .role }}" != "server" ]]; then
+# Install Starship ONLY for Interactive roles (Save RAM/Disk)
+if [[ "{{ .role }}" == "centaur" || "{{ .role }}" == "chimera" || "{{ .role }}" == "griffin" ]]; then
     if ! command_exists starship; then
         echo "Installing Starship..."
         curl -sS https://starship.rs/install.sh | sh -s -- -y
@@ -79,7 +87,8 @@ if ! command_exists bw; then
 fi
 
 # Install FiraCode Nerd Font for non-server roles
-if [[ "{{ .role }}" != "server" ]]; then
+# Install FiraCode Nerd Font for Interactive roles
+if [[ "{{ .role }}" == "centaur" || "{{ .role }}" == "chimera" || "{{ .role }}" == "griffin" ]]; then
     FONT_DIR="$HOME/.local/share/fonts"
     # Check if font already exists to avoid re-downloading
     if [[ ! -f "$FONT_DIR/FiraCodeNerdFont-Regular.ttf" ]]; then

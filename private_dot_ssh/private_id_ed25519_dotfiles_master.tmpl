@@ -1,4 +1,4 @@
-{{- if or (eq .role "commander") (eq .role "workstation") -}}
+{{- if or (eq .role "centaur") (eq .role "chimera") -}}
 {{-   if (env "BW_SESSION") -}}
 {{-     $key := (bitwarden "item" "ssh-key-master-ed25519") -}}
 {{-     if $key -}}
