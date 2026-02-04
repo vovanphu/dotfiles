@@ -73,10 +73,13 @@ if (-not $env:BW_SESSION) {
         
         if ($statusObj.status -eq "unauthenticated") {
             Write-Host "You are not logged in to Bitwarden." -ForegroundColor Yellow
+            Write-Host ">>> STEP 1: Authenticate Device (Login)" -ForegroundColor Cyan
             bw login
+            Write-Host "Login successful." -ForegroundColor Green
         }
         
         # Unlock
+        Write-Host ">>> STEP 2: Decrypt Vault (Unlock)" -ForegroundColor Cyan
         $output = bw unlock --raw
         if ($LASTEXITCODE -eq 0 -and $output) {
             $env:BW_SESSION = $output

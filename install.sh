@@ -79,10 +79,13 @@ if [ -z "${BW_SESSION:-}" ]; then
         # Check login status
         if bw status | grep -q "unauthenticated"; then
              echo "You are not logged in to Bitwarden."
+             echo ">>> STEP 1: Authenticate Device (Login)"
              bw login
+             echo "Login successful."
         fi
     
         # Unlock and capture session
+        echo ">>> STEP 2: Decrypt Vault (Unlock)"
         BW_SES=$(bw unlock --raw)
         if [ $? -eq 0 ]; then
              export BW_SESSION="$BW_SES"
