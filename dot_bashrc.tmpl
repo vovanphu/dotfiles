@@ -5,6 +5,11 @@
 alias {{ $alias }}='{{ $command }}'
 {{ end -}}
 
+# Add local bin to path (MUST be before Starship init)
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
+
 {{ range $alias, $command := .unixAliases -}}
 alias {{ $alias }}='{{ $command }}'
 {{ end -}}
@@ -53,10 +58,7 @@ if command -v starship &> /dev/null; then
     eval "$(starship init bash)"
 fi
 
-# Add local bin to path
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
-fi
+
 
 # --- SSH Agent Auto-Load ---
 # --- SSH Agent Auto-Load (Robost Socket Reuse) ---
