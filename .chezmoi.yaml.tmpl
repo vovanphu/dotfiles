@@ -30,8 +30,9 @@
 {{- $packages := include "packages.yaml" | fromYaml -}}
 {{- if hasKey $packages.name_pools $role -}}
 {{-   $pool := index $packages.name_pools $role -}}
+{{-   $choices := append $pool "custom" -}}
 {{-   $msg := list "Choose a Hostname for" $role | join " " -}}
-{{-   $hostname_selection = promptChoice $msg $pool "custom" -}}
+{{-   $hostname_selection = promptChoice $msg $choices "custom" -}}
 {{- end -}}
 
 {{- if eq $hostname_selection "custom" -}}

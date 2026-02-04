@@ -31,8 +31,9 @@ if [ ! -f "install.sh" ]; then
     
     # 3. Handover
     echo "Handing over to local install script..."
+    cd "$DEST_DIR" || exit
     # Ensure usage of bash for the local script
-    exec bash "$DEST_DIR/install.sh"
+    exec bash "install.sh"
     exit
 fi
 # ------------------------------
