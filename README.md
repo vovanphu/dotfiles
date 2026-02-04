@@ -26,7 +26,7 @@ The script handles dependency checks (`unzip`, `curl`), Bitwarden login, and SSH
 
 ```bash
 # Run this valid one-liner:
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/vovanphu/dotfiles/master/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/vovanphu/dotfiles/master/install.sh)"
 ```
 
 ---
