@@ -58,3 +58,12 @@ We use a **Mythological Role System** to categorize machines. Choose wisely:
     *   **Self-Healing**: Automatically derives SSH Public keys (`.pub`) locally whenever private keys change.
     *   **GUI Ready**: Automatically installs **FiraCode Nerd Font** on Windows and Linux (Interactive roles).
 *   **🐚 Unified Shell**: Starship prompt & aliases consistent across PowerShell and Bash.
+
+## ❓ Troubleshooting
+
+### Factory Reset (Re-select Role/Hostname)
+The system remembers your choices in `~/.config/chezmoi/chezmoi.toml`. To force a fresh start:
+*   **Linux**: `rm ~/.config/chezmoi/chezmoi.toml`
+*   **Windows**: `Remove-Item $env:USERPROFILE\.config\chezmoi\chezmoi.toml`
+
+Then run the install script again.

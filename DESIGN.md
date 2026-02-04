@@ -132,6 +132,7 @@ Sensitive files (like `.ssh/config`) will be stored using Chezmoi's `private_` p
     *   *Impact*: New machine installations will fail to auto-join Tailscale after expiry. Existing machines are unaffected (due to Tags).
     *   *Action*: Every 3 months (or upon installation failure), generate a new Reusable Key on Tailscale Console and update the `tailscale-auth-key` password in Bitwarden.
 *   **SSH Key Rotation**: If Master Keys are compromised, generate new ones, update Bitwarden, and run `chezmoi apply` on all machines.
+*   **Configuration Reset**: To change a machine's Role or Hostname after valid initialization, delete `~/.config/chezmoi/chezmoi.toml` and re-run the installer.
 
 ## 7. Future Considerations
 *   **Package Management**: Linking `Brewfile`, `scoop export`, and `apt bundle` lists to the dotfiles lifecycle.

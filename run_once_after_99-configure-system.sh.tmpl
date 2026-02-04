@@ -50,31 +50,46 @@ if [ "$CURRENT_NAME" != "$TARGET_NAME" ]; then
     echo -e "Current Hostname: \033[33m$CURRENT_NAME\033[0m"
     echo -e "Target Mythos Name:  \033[32m$TARGET_NAME\033[0m"
     
-    read -p "Do you want to rename this system (OS Level) to '$TARGET_NAME'? (y/n) " -n 1 -r
-    echo 
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "Renaming system..."
-        
-        if command -v hostnamectl >/dev/null 2>&1; then
-            # Systemd method
-            sudo hostnamectl set-hostname "$TARGET_NAME"
+    echo -e "Current Hostname: \033[33m$CURRENT_NAME\033[0m"
+    echo -e "Target Mythos Name:  \033[32m$TARGET_NAME\033[0m"
+    echo "Hostname mismatch detected. Auto-correcting to match Mythos..."
+    
+    echo "Renaming system..."
+    
+    if command -v hostnamectl >/dev/null 2>&1; then
+        # Systemd method
+        if is_root; then
+            hostnamectl set-hostname "$TARGET_NAME"
         else
-            # Legacy method
+            sudo hostnamectl set-hostname "$TARGET_NAME"
+        fi
+    else
+        # Legacy method
+        if is_root; then
+            hostname "$TARGET_NAME"
+            echo "$TARGET_NAME" > /etc/hostname
+        else
             sudo hostname "$TARGET_NAME"
             echo "$TARGET_NAME" | sudo tee /etc/hostname > /dev/null
-            
-            # Update /etc/hosts to prevent sudo warnings
-            if grep -q "127.0.1.1" /etc/hosts; then
+        fi
+        
+        # Update /etc/hosts to prevent sudo warnings
+        if grep -q "127.0.1.1" /etc/hosts; then
+            if is_root; then
+                sed -i "s/^127.0.1.1.*/127.0.1.1\t$TARGET_NAME/" /etc/hosts
+            else
                 sudo sed -i "s/^127.0.1.1.*/127.0.1.1\t$TARGET_NAME/" /etc/hosts
+            fi
+        else
+            if is_root; then
+                echo -e "127.0.1.1\t$TARGET_NAME" >> /etc/hosts
             else
                 echo -e "127.0.1.1\t$TARGET_NAME" | sudo tee -a /etc/hosts > /dev/null
             fi
         fi
-        
-        echo -e "\033[32mSuccess: Hostname changed. Please restart your shell/system.\033[0m"
-    else
-        echo "Skipping OS rename."
     fi
+    
+    echo -e "\033[32mSuccess: Hostname changed to '$TARGET_NAME'. Please restart your system.\033[0m"
 else
     echo -e "\033[32mSystem Hostname is already synced.\033[0m"
 fi

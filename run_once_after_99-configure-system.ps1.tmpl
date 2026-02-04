@@ -39,17 +39,14 @@ if ($currentName -ne $targetName) {
     Write-Host "Current System Name: $currentName" -ForegroundColor Yellow
     Write-Host "Target Mythos Name:  $targetName" -ForegroundColor Green
     
-    $choice = Read-Host "Do you want to rename this computer (OS Level) to '$targetName'? (y/n)"
-    if ($choice -eq 'y') {
-        try {
-            Rename-Computer -NewName $targetName -Force -ErrorAction Stop
-            Write-Host "SUCCESS: Hostname changed to '$targetName'." -ForegroundColor Green
-            Write-Host "IMPORTANT: You must RESTART your computer for this to take effect." -ForegroundColor Red
-        } catch {
-            Write-Error "Failed to rename computer. Please ensure you are running this script as ADMINISTRATOR."
-        }
-    } else {
-        Write-Host "Skipping OS rename. Hostname remains '$currentName'." -ForegroundColor Gray
+    Write-Host "Auto-correcting system name..." -ForegroundColor Cyan
+    
+    try {
+        Rename-Computer -NewName $targetName -Force -ErrorAction Stop
+        Write-Host "SUCCESS: Hostname changed to '$targetName'." -ForegroundColor Green
+        Write-Host "IMPORTANT: You must RESTART your computer for this to take effect." -ForegroundColor Red
+    } catch {
+        Write-Error "Failed to rename computer. Please ensure you are running this script as ADMINISTRATOR."
     }
 } else {
     Write-Host "System Hostname is already synced ($targetName)." -ForegroundColor Green
