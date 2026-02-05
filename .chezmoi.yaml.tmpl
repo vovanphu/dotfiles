@@ -35,8 +35,8 @@
 {{-   if hasKey $packages.name_pools $role -}}
 {{-     $pool := index $packages.name_pools $role -}}
 {{-     $choices := append $pool "custom" -}}
-{{-     $msg := list "Choose a Hostname for" $role | join " " -}}
-{{-     $hostname_selection = promptChoice $msg $choices "custom" -}}
+{{-     $msg := list "Choose a Hostname for" $role ": (" ($choices | join ", ") ")" | join "" -}}
+{{-     $hostname_selection = promptString $msg "custom" -}}
 {{-   end -}}
 
 {{-   if eq $hostname_selection "custom" -}}
