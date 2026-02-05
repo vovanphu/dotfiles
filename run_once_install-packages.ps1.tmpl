@@ -3,7 +3,7 @@
 # This script runs only when the hash of this file changes.
 # Version: 1.1 (Force Run for Agent Setup)
 
-$pkgData = {{ include "packages.yaml" | fromYaml | toJson }} | ConvertFrom-Json
+$pkgData = '{{ include "packages.yaml" | fromYaml | toJson }}' | ConvertFrom-Json
 $winData = $pkgData.windows
 
 Write-Host "Starting Windows Package Installation via Winget..." -ForegroundColor Cyan
