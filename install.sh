@@ -12,10 +12,10 @@ if [ ! -f "install.sh" ]; then
     if ! command -v git &> /dev/null; then
         echo "Git not found. Installing..."
         if command -v apt-get &> /dev/null; then
-             sudo apt-get update && sudo apt-get install -y git
+            sudo apt-get update && sudo apt-get install -y git
         else
-             echo "Error: Git is required. Please install Git manually."
-             exit 1
+            echo "Error: Git is required. Please install Git manually."
+            exit 1
         fi
     fi
     
@@ -73,28 +73,28 @@ fi
 if [ -z "${BW_SESSION:-}" ]; then
     echo ""
     echo "--- Bitwarden Setup ---"
-    read -p "Bitwarden session not detected. Unlock vault now to provision secrets? (y/n) " -n 1 -r
+    read -p "Bitwarden session not detected. Unlock vault now to provision secrets? (y/n) " -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [[ $REPLY =~ ^[Yy] ]]; then
         # Check login status
         if bw status | grep -q "unauthenticated"; then
-             echo "You are not logged in to Bitwarden."
-             echo ">>> STEP 1: Authenticate Device (Login)"
-             bw login
-             echo "Login successful."
+            echo "You are not logged in to Bitwarden."
+            echo ">>> STEP 1: Authenticate Device (Login)"
+            bw login
+            echo "Login successful."
         fi
     
         # Unlock and capture session
         echo ">>> STEP 2: Decrypt Vault (Unlock)"
         BW_SES=$(bw unlock --raw)
         if [ $? -eq 0 ]; then
-             export BW_SESSION="$BW_SES"
-             echo "Vault unlocked!"
-             echo "Syncing Bitwarden vault..."
-             bw sync
+            export BW_SESSION="$BW_SES"
+            echo "Vault unlocked!"
+            echo "Syncing Bitwarden vault..."
+            bw sync
         else
-             echo "Warning: Failed to unlock vault. Secrets will not be provisioned. Proceeding..."
-             # Do not exit
+            echo "Warning: Failed to unlock vault. Secrets will not be provisioned. Proceeding..."
+            # Do not exit
         fi
     fi
 fi
@@ -114,9 +114,9 @@ if [ -f "$HOME/.ssh/id_ed25519" ]; then
     mv "$HOME/.ssh/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub.bak" 2>/dev/null || true
 fi
 if [ -f "$HOME/.ssh/id_ed25519_dotfiles" ]; then
-     echo "Backing up legacy dotfiles key..."
-     mv "$HOME/.ssh/id_ed25519_dotfiles" "$HOME/.ssh/id_ed25519_dotfiles.bak"
-     mv "$HOME/.ssh/id_ed25519_dotfiles.pub" "$HOME/.ssh/id_ed25519_dotfiles.pub.bak" 2>/dev/null || true
+    echo "Backing up legacy dotfiles key..."
+    mv "$HOME/.ssh/id_ed25519_dotfiles" "$HOME/.ssh/id_ed25519_dotfiles.bak"
+    mv "$HOME/.ssh/id_ed25519_dotfiles.pub" "$HOME/.ssh/id_ed25519_dotfiles.pub.bak" 2>/dev/null || true
 fi
 
 echo "Setup complete. Please reload your shell."
