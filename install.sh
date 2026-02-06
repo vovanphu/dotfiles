@@ -39,6 +39,7 @@ fi
 # ------------------------------
 
 # Identify chezmoi binary (Default to ~/.local/bin)
+export PATH="$HOME/.local/bin:$PATH"
 CHEZMOI_BIN="$HOME/.local/bin/chezmoi"
 
 # Install chezmoi if not found
